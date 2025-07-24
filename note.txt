@@ -1,6 +1,6 @@
 PROX PASSOS 
 
-- integrar os valores do combobox em tempo real com o timer
+fazer o sistema do pomodoro 
 
 APLICATIVO POMODORO IDEIAS
 
