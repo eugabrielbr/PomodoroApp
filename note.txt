@@ -1,4 +1,11 @@
+PROX PASSOS 
+
+- integrar os valores do combobox em tempo real com o timer
+
 APLICATIVO POMODORO IDEIAS
 
-- som ao passar os segundos
+- som ao passar os segundos (tictac, ruido, etc)
+- alerta de responsabilidade para cumprir o pomodoro 
+
+
 
