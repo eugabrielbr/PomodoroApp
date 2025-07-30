@@ -1,5 +1,3 @@
-
-
 from ttkbootstrap import ttk,Window
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
@@ -7,9 +5,6 @@ import threading
 import time
 from timerThread import TimerThread
 from auxFunctions import format_time,notificationSystem
-
-
-seconds = 2
 
 class PomodoroApp:
     
@@ -37,7 +32,7 @@ class PomodoroApp:
         self.label_aviso = ttk.Label(frame_label, text="Selecione um tempo de concentração, intervalo e número de sessões", font=("Arial", 8))
         self.label_aviso.pack(pady=1, side = "left")
 
-        self.combo_hour = ttk.Combobox(frame_combos, values=[f"{i:01d} min" for i in range(1, 61)], width=13, state="readonly")
+        self.combo_hour = ttk.Combobox(frame_combos, values=[f"{i:01d} min" for i in range(5, 61,5)], width=13, state="readonly")
         self.combo_hour.set("concentração")
         self.combo_hour.configure(foreground="gray")
         self.combo_hour.pack(pady=1,padx= 5,side ="left")
@@ -47,14 +42,13 @@ class PomodoroApp:
         self.combo_hour3.set("intervalo")
         self.combo_hour3.configure(foreground="gray")
         self.combo_hour3.pack(pady=1,padx= 5,side ="left")
-        
 
         self.combo_hour2 = ttk.Combobox(frame_combos, values=[f"{i:01d}" for i in range(1, 11)], width=13, state="readonly")
         self.combo_hour2.set("sessões")
         self.combo_hour2.configure(foreground="gray")
         self.combo_hour2.pack(pady=1,padx= 5,side ="left")
 
-        self.label_timer = ttk.Label(frame_timer, text=format_time(self.initial_timer_user), font=("Arial", 50))
+        self.label_timer = ttk.Label(frame_timer, text=format_time(self.initial_timer_user), font=("Terminal", 50),foreground="white")
         self.label_timer.pack(pady=20)
 
         self.start_button = ttk.Button(frame_buttons, text="Start", command=lambda: self.start_timer(self.initial_timer_user),bootstyle=(SUCCESS),width=8,state="disabled")
@@ -99,6 +93,7 @@ class PomodoroApp:
         if valor.isdigit():
             self.initial_timer_user = int(valor) * 60
             self.update_ui(self.initial_timer_user)
+            self.reset_timer()
         else:
             self.initial_timer_user = 0
 
@@ -107,10 +102,10 @@ class PomodoroApp:
         
         self.start_button.configure(state=state)
     
-    
+
 def main():
-    global seconds
-    root = Window(themename="superhero")
+
+    root = Window(themename="solar")
     root.geometry("400x380")
     app = PomodoroApp(root)
     root.mainloop()
