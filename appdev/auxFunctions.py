@@ -22,6 +22,7 @@ def notificationSystem(titulo, mensagem, timeout):
     notificacao_ativa = True
 
     def worker():
+        
         global notificacao_ativa
         notification = ToastNotifier()
         notification.show_toast(
@@ -31,6 +32,7 @@ def notificationSystem(titulo, mensagem, timeout):
             threaded=True,
             callback_on_click=ao_clicar
         )
+        
         time.sleep(timeout)
         notificacao_ativa = False
 

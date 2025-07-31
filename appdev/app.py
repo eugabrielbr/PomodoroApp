@@ -32,7 +32,7 @@ class PomodoroApp:
         self.label_aviso = ttk.Label(frame_label, text="Selecione um tempo de concentração, intervalo e número de sessões", font=("Arial", 8))
         self.label_aviso.pack(pady=1, side = "left")
 
-        self.combo_hour = ttk.Combobox(frame_combos, values=[f"{i:01d} min" for i in range(5, 61,5)], width=13, state="readonly")
+        self.combo_hour = ttk.Combobox(frame_combos, values=[f"{i:01d} min" for i in range(2)], width=13, state="readonly") #5, 61,5
         self.combo_hour.set("concentração")
         self.combo_hour.configure(foreground="gray")
         self.combo_hour.pack(pady=1,padx= 5,side ="left")

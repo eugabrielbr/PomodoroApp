@@ -1,0 +1,16 @@
+PASSOS 
+
+- fazer um temporizador inicialmente com interface - OK 
+- fazer o sistema do pomodoro (intervalo, loop de trabalho, etc)
+- mudar som de notificacao de timer expirado
+- implementar menu de configuracoes 
+- sons do relogio
+
+
+APLICATIVO POMODORO IDEIAS
+
+- som ao passar os segundos (tictac, ruido, etc)
+- alerta de responsabilidade para cumprir o pomodoro - OK 
+
+
+
