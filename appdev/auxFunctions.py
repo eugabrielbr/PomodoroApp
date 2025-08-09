@@ -30,7 +30,8 @@ def notificationSystem(titulo, mensagem, timeout):
             msg=mensagem,
             duration=timeout,
             threaded=True,
-            callback_on_click=ao_clicar
+            callback_on_click=ao_clicar,
+            icon_path="C:/vscode/PomodoroApp/resources/icons/notification.ico"
         )
         
         time.sleep(timeout)
