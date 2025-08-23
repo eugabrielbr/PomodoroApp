@@ -6,13 +6,19 @@ import time
 from timerThread import TimerThread
 from auxFunctions import format_time,notificationSystem
 
-#teste pullrequest
+#INICIAR INTERVALO AO CLICAR NA NOTIFICACAO
+# REFATORAR OQ DER OU PEDIR PRO GPT DEIXAR ORGANIZADO ALGUMAS PARTES 
 
 class PomodoroApp:
     
     def __init__(self,root):
         
-        self.initial_timer_user = 0 # tempo que vai contar no timer 
+        self.initial_timer_user = 0# tempo que vai contar no timer 
+        self.number_of_sessions = 0
+        self.time_interval = 0
+        self.interval = False # gerencia a alternancia entre intervalo e sessao 
+        self.lock = threading.Lock()
+        self.finish = 0 # ignora quando o remaning é 0 duas vezes seguidas // false = nao terminou || true = terminou
 
         # elementos do app 
         self.root = root
@@ -38,17 +44,19 @@ class PomodoroApp:
         self.combo_hour.set("concentração")
         self.combo_hour.configure(foreground="gray")
         self.combo_hour.pack(pady=1,padx= 5,side ="left")
-        self.combo_hour.bind("<<ComboboxSelected>>", lambda e: (self.comboboxcheck(self.combo_hour.get().strip(" min")),self.changeStatusButton("normal")))
+        self.combo_hour.bind("<<ComboboxSelected>>", lambda e: (self.timer_change(self.combo_hour.get().strip(" min")),self.changeStatusButton("normal")))
 
-        self.combo_hour3 = ttk.Combobox(frame_combos, values=["5 min","10 min","15 min"], width=13, state="readonly")
+        self.combo_hour3 = ttk.Combobox(frame_combos, values=["30 min","10 min","15 min"], width=13, state="readonly")
         self.combo_hour3.set("intervalo")
         self.combo_hour3.configure(foreground="gray")
         self.combo_hour3.pack(pady=1,padx= 5,side ="left")
+        self.combo_hour3.bind("<<ComboboxSelected>>", lambda e: (self.timer_sessions_change(self.combo_hour3.get().strip(" min"))))
 
         self.combo_hour2 = ttk.Combobox(frame_combos, values=[f"{i:01d}" for i in range(1, 11)], width=13, state="readonly")
         self.combo_hour2.set("sessões")
         self.combo_hour2.configure(foreground="gray")
         self.combo_hour2.pack(pady=1,padx= 5,side ="left")
+        self.combo_hour2.bind("<<ComboboxSelected>>", lambda e: (self.sessions_change(self.combo_hour2.get())))
 
         self.label_timer = ttk.Label(frame_timer, text=format_time(self.initial_timer_user), font=("Terminal", 50),foreground="white")
         self.label_timer.pack(pady=20)
@@ -63,46 +71,122 @@ class PomodoroApp:
 
         self.actual = True #gambiarra 
 
-    def update_ui(self, remaining_seconds):
-        self.label_timer.config(text=format_time(remaining_seconds))
-        if remaining_seconds == 0:
-            self.label_timer.config(text="00:00")
-            notificationSystem("Timer expirado!", "Hora do intervalo! Nada de celular, hein?!", 3)
+      
 
-    def start_timer(self,initial_timer):
+    def update_ui(self, remaining_seconds):
+        
+        self.label_timer.config(text=format_time(remaining_seconds))
+        try:
+
+            if remaining_seconds == 0:
+                print(self.initial_timer_user, self.number_of_sessions, self.time_interval)
+                
+                self.timer_thread.stop()
+
+                if self.number_of_sessions == 0:
+
+                    self.label_timer.config(text="00:00")
+                    notificationSystem("Timer expirado!", "Sua sessão pomodoro acabou. Espero que tenha sido produtivo! :D", 3)
+
+                elif self.number_of_sessions > 0 and not self.interval: 
+                    
+                    notificationSystem("Hora da pausa!", "Nada de celular, ein?!", 3)
+                    
+                    self.interval = True
+                    
+                    print("=============================> aqui")
+                    self.start_timer(self.time_interval)
+                    self.finish = False 
+                
+                elif self.number_of_sessions > 0 and self.interval and self.finish == 0:
+                    
+                    print("-----------------------------> aqui")
+                    notificationSystem("Fim do intervalo", "De volta ao foco!", 3)
+                    
+                    self.start_timer(self.initial_timer_user)
+                    self.number_of_sessions -= 1
+                    self.interval = False
+                
+                self.finish += 1
+                
+            if self.finish > 2:
+                self.finish = 0 
+        
+        except ValueError:
+            pass
+
+    def start_timer(self, initial_timer):
+        
         self.actual = True
+
         if initial_timer == 0:
-            notificationSystem("Selecione um timer!", "Você precisa selecionar um tempo para iniciar",3)
-            return 
-        if self.timer_thread and self.timer_thread.is_alive():
-            return  # Já está rodando
-        self.timer_thread = TimerThread(initial_timer, self.thread_safe_update)
-        self.timer_thread.start()
+            notificationSystem("Selecione um timer!", "Você precisa selecionar um tempo para iniciar", 3)
+            return
+
+        def _wait_and_start():
+            if self.timer_thread and self.timer_thread.is_alive():
+                # Reagenda para verificar daqui 50ms sem travar a UI
+                self.root.after(50, _wait_and_start)
+            else:
+                
+                self.timer_thread = TimerThread(initial_timer, self.thread_safe_update)
+                self.timer_thread.start()
+                
+                return 
+
+        _wait_and_start()  
 
     def reset_timer(self):
+        
         if self.timer_thread:
             self.timer_thread.stop()
+            self.interval = False 
+
             self.actual = False 
             self.root.after(0, lambda: self.update_ui(self.initial_timer_user))
+        
+        self.number_of_sessions = 0 
+        self.time_interval = 0
+        self.initial_timer_user = 0 
+        self.combo_hour3.set("intervalo")
+        self.combo_hour2.set("sessões")
+        self.combo_hour.set("concentração")
+        self.changeStatusButton("disabled")
+        self.update_ui(0)
+
             
     def thread_safe_update(self, remaining_seconds):
-        if self.actual: # só atualiza se o o botao reset nao for pressionado
+        if self.actual: # só atualiza se o lock permitir
             # Garante que a atualização da UI ocorra na thread principal
             self.root.after(0, lambda: self.update_ui(remaining_seconds))
 
-    def comboboxcheck(self,valor):
+    def timer_change(self,value):
 
-        if valor.isdigit():
-            self.initial_timer_user = int(valor) * 60
+        if value.isdigit():
+            self.initial_timer_user = int(value) * 60
             self.update_ui(self.initial_timer_user)
-            self.reset_timer()
         else:
             self.initial_timer_user = 0
+
+
+    def sessions_change(self,value):
+        value = int(value)
+        
+        if value > 0:
+            
+            self.number_of_sessions = value - 1 
+
+    def timer_sessions_change(self,value):
+
+        self.time_interval = int(value) 
+        #falta transformar em minutos
 
 
     def changeStatusButton(self, state):
         
         self.start_button.configure(state=state)
+
+
     
 
 def main():
