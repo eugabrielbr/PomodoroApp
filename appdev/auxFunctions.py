@@ -3,6 +3,7 @@ import threading
 import time
 import os
 
+
 notificacao_ativa = False
 
 def format_time(seconds):
@@ -11,7 +12,8 @@ def format_time(seconds):
     return f"{minutes:02}:{seconds:02}"
 
 def ao_clicar():
-    print("Notificação clicada!")
+    return
+
 
 def notificationSystem(titulo, mensagem, timeout):
     global notificacao_ativa
@@ -39,3 +41,29 @@ def notificationSystem(titulo, mensagem, timeout):
 
     threading.Thread(target=worker, daemon=True).start()
 
+def notification_with_click(titulo, mensagem, timeout):
+    """
+    Mostra uma notificação e só retorna depois que o usuário clicar.
+    """
+    clicou_event = threading.Event()  # cria um evento para sincronização
+
+    def ao_clicar():
+        print("Notificação clicada!")
+        clicou_event.set()  # libera a espera
+
+    notification = ToastNotifier()
+    notification.show_toast(
+        title=titulo,
+        msg=mensagem,
+        duration=timeout,
+        threaded=True,
+        callback_on_click=ao_clicar,
+        icon_path="C:/vscode/PomodoroApp/resources/icons/notification.ico"
+    )
+
+    print("Esperando clique do usuário...")
+    clicou_event.wait(timeout)  # bloqueia aqui até clicar ou expirar o timeout
+    if not clicou_event.is_set():
+        print("Tempo expirou sem clique")
+      
+    return clicou_event.is_set()  # True se clicou, False se expirou

@@ -4,7 +4,7 @@ from ttkbootstrap.constants import *
 import threading
 import time
 from timerThread import TimerThread
-from auxFunctions import format_time,notificationSystem
+from auxFunctions import format_time,notificationSystem,ao_clicar,notification_with_click
 
 #INICIAR INTERVALO AO CLICAR NA NOTIFICACAO
 # REFATORAR OQ DER OU PEDIR PRO GPT DEIXAR ORGANIZADO ALGUMAS PARTES 
@@ -79,7 +79,7 @@ class PomodoroApp:
         try:
 
             if remaining_seconds == 0:
-                print(self.initial_timer_user, self.number_of_sessions, self.time_interval)
+                
                 
                 self.timer_thread.stop()
 
@@ -90,19 +90,17 @@ class PomodoroApp:
 
                 elif self.number_of_sessions > 0 and not self.interval: 
                     
-                    notificationSystem("Hora da pausa!", "Nada de celular, ein?!", 3)
-                    
+                    retorno = notification_with_click("Hora da pausa!", "Clique aqui para começar seu intervalo", 120)
+
                     self.interval = True
-                    
-                    print("=============================> aqui")
                     self.start_timer(self.time_interval)
                     self.finish = False 
                 
                 elif self.number_of_sessions > 0 and self.interval and self.finish == 0:
                     
-                    print("-----------------------------> aqui")
-                    notificationSystem("Fim do intervalo", "De volta ao foco!", 3)
-                    
+        
+                    retorno = notification_with_click("Fim do intervalo", "Clique aqui para voltar ao foco", 120)
+
                     self.start_timer(self.initial_timer_user)
                     self.number_of_sessions -= 1
                     self.interval = False
