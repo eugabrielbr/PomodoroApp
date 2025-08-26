@@ -1,7 +1,7 @@
-[EM ANDAMENTO]
-Decidi fazer um app para pomodoro do meu jeito e implementando algumas sugestões de usuários.
+[IN PROGRESS] I decided to make a Pomodoro app my way, implementing some user suggestions.
 
-Tecnologias que estão sendo usadas até o momento
+Technologies currently being used
 
-- Python (backend)
-- ttkbootstrap (frontend)
+Python (backend)
+ttkbootstrap (frontend)
+
