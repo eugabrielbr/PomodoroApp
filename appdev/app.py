@@ -40,23 +40,23 @@ class PomodoroApp:
         self.label_aviso = ttk.Label(frame_label, text="Selecione um tempo de concentração, intervalo e número de sessões", font=("Arial", 8))
         self.label_aviso.pack(pady=1, side = "left")
 
-        self.combo_hour = ttk.Combobox(frame_combos, values=[f"{i:01d} min" for i in range(2)], width=13, state="readonly") #5, 61,5
+        self.combo_hour = ttk.Combobox(frame_combos, values=[f"{i:01d} min" for i in range(5, 61,5)], width=13, state="readonly") #5, 61,5
         self.combo_hour.set("concentração")
         self.combo_hour.configure(foreground="gray")
         self.combo_hour.pack(pady=1,padx= 5,side ="left")
         self.combo_hour.bind("<<ComboboxSelected>>", lambda e: (self.timer_change(self.combo_hour.get().strip(" min")),self.changeStatusButton("normal")))
 
-        self.combo_hour3 = ttk.Combobox(frame_combos, values=["30 min","10 min","15 min"], width=13, state="readonly")
+        self.combo_hour3 = ttk.Combobox(frame_combos, values=["5 min","10 min","15 min","30 min"], width=13, state="readonly")
         self.combo_hour3.set("intervalo")
         self.combo_hour3.configure(foreground="gray")
         self.combo_hour3.pack(pady=1,padx= 5,side ="left")
-        self.combo_hour3.bind("<<ComboboxSelected>>", lambda e: (self.timer_sessions_change(self.combo_hour3.get().strip(" min"))))
+        self.combo_hour3.bind("<<ComboboxSelected>>", lambda e: (self.timer_interval_change(self.combo_hour3.get().strip(" min"))))
 
         self.combo_hour2 = ttk.Combobox(frame_combos, values=[f"{i:01d}" for i in range(1, 11)], width=13, state="readonly")
         self.combo_hour2.set("sessões")
         self.combo_hour2.configure(foreground="gray")
         self.combo_hour2.pack(pady=1,padx= 5,side ="left")
-        self.combo_hour2.bind("<<ComboboxSelected>>", lambda e: (self.sessions_change(self.combo_hour2.get())))
+        self.combo_hour2.bind("<<ComboboxSelected>>", lambda e: (self.timer_sessions_change(self.combo_hour2.get())))
 
         self.label_timer = ttk.Label(frame_timer, text=format_time(self.initial_timer_user), font=("Terminal", 50),foreground="white")
         self.label_timer.pack(pady=20)
@@ -80,7 +80,6 @@ class PomodoroApp:
 
             if remaining_seconds == 0:
                 
-                
                 self.timer_thread.stop()
 
                 if self.number_of_sessions == 0:
@@ -90,20 +89,18 @@ class PomodoroApp:
 
                 elif self.number_of_sessions > 0 and not self.interval: 
                     
-                    retorno = notification_with_click("Hora da pausa!", "Clique aqui para começar seu intervalo", 120)
+                    threading.Thread(
+                        target=lambda: self.notification_interval("Hora da pausa!", "Clique aqui para começar seu intervalo", 120),
+                        daemon=True
+                    ).start()
 
-                    self.interval = True
-                    self.start_timer(self.time_interval)
-                    self.finish = False 
                 
                 elif self.number_of_sessions > 0 and self.interval and self.finish == 0:
                     
-        
-                    retorno = notification_with_click("Fim do intervalo", "Clique aqui para voltar ao foco", 120)
-
-                    self.start_timer(self.initial_timer_user)
-                    self.number_of_sessions -= 1
-                    self.interval = False
+                    threading.Thread(
+                        target=lambda: self.notification_focus("Fim do intervalo", "Clique aqui para voltar ao foco", 120),
+                        daemon=True
+                    ).start()
                 
                 self.finish += 1
                 
@@ -167,22 +164,47 @@ class PomodoroApp:
             self.initial_timer_user = 0
 
 
-    def sessions_change(self,value):
+    def timer_sessions_change(self,value):
         value = int(value)
         
         if value > 0:
             
             self.number_of_sessions = value - 1 
 
-    def timer_sessions_change(self,value):
+    def timer_interval_change(self,value):
 
-        self.time_interval = int(value) 
-        #falta transformar em minutos
+        self.time_interval = int(value) * 60
 
 
     def changeStatusButton(self, state):
         
         self.start_button.configure(state=state)
+
+    def notification_interval(self, title, message, timeout):
+        retorno = notification_with_click(title, message, timeout)
+
+        if retorno:  # se clicou na notificação
+            # agenda no Tkinter (sem travar)
+            self.root.after(0, lambda: self.start_interval())
+
+    def notification_focus(self, title, message, timeout):
+        retorno = notification_with_click(title, message, timeout)
+
+        if retorno:  # se clicou na notificação
+            # agenda no Tkinter (sem travar)
+            self.root.after(0, lambda: self.start_focus())
+
+    def start_interval(self):
+        """Inicia o intervalo após a notificação"""
+        self.interval = True
+        self.start_timer(self.time_interval)
+        self.finish = False
+    
+    def start_focus(self):
+        """Volta para a sessão de foco após a notificação"""
+        self.interval = False
+        self.start_timer(self.initial_timer_user)
+        self.number_of_sessions -= 1
 
 
     

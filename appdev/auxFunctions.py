@@ -46,7 +46,7 @@ def notification_with_click(titulo, mensagem, timeout):
     Mostra uma notificação e só retorna depois que o usuário clicar.
     """
     clicou_event = threading.Event()  # cria um evento para sincronização
-
+    timeout_click = 240
     def ao_clicar():
         print("Notificação clicada!")
         clicou_event.set()  # libera a espera
@@ -62,7 +62,7 @@ def notification_with_click(titulo, mensagem, timeout):
     )
 
     print("Esperando clique do usuário...")
-    clicou_event.wait(timeout)  # bloqueia aqui até clicar ou expirar o timeout
+    clicou_event.wait(timeout_click)  # bloqueia aqui até clicar ou expirar o timeout
     if not clicou_event.is_set():
         print("Tempo expirou sem clique")
       
