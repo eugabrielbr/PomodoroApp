@@ -168,7 +168,7 @@ class PomodoroApp:
     def timer_change(self,value):
 
         if value.isdigit():
-            self.initial_timer_user = int(value) 
+            self.initial_timer_user = int(value) * 60
             self.update_ui(self.initial_timer_user)
         else:
             self.initial_timer_user = 0
@@ -183,7 +183,7 @@ class PomodoroApp:
 
     def timer_interval_change(self,value):
 
-        self.time_interval = int(value)
+        self.time_interval = int(value) * 60
 
 
     def changeStatusButton(self, state):
