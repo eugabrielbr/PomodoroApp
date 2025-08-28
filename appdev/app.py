@@ -6,8 +6,7 @@ import time
 from timerThread import TimerThread
 from auxFunctions import format_time,notificationSystem,ao_clicar,notification_with_click
 
-#INICIAR INTERVALO AO CLICAR NA NOTIFICACAO
-# REFATORAR OQ DER OU PEDIR PRO GPT DEIXAR ORGANIZADO ALGUMAS PARTES 
+# ta notificando duas vezes
 
 class PomodoroApp:
     
@@ -85,9 +84,13 @@ class PomodoroApp:
                 if self.number_of_sessions == 0:
 
                     self.label_timer.config(text="00:00")
+                    self.combo_hour.state(["!disabled"])
+                    self.combo_hour2.state(["!disabled"]) #disabled combobox when starting the timer
+                    self.combo_hour3.state(["!disabled"])
+
                     notificationSystem("Timer expirado!", "Sua sessão pomodoro acabou. Espero que tenha sido produtivo! :D", 3)
 
-                elif self.number_of_sessions > 0 and not self.interval: 
+                elif self.number_of_sessions > 0 and not self.interval and self.finish == 0: 
                     
                     threading.Thread(
                         target=lambda: self.notification_interval("Hora da pausa!", "Clique aqui para começar seu intervalo", 120),
@@ -112,6 +115,10 @@ class PomodoroApp:
 
     def start_timer(self, initial_timer):
         
+        self.combo_hour.state(["disabled"])
+        self.combo_hour2.state(["disabled"]) #disabled combobox when starting the timer
+        self.combo_hour3.state(["disabled"])
+
         self.actual = True
 
         if initial_timer == 0:
@@ -148,6 +155,9 @@ class PomodoroApp:
         self.combo_hour.set("concentração")
         self.changeStatusButton("disabled")
         self.update_ui(0)
+        self.combo_hour.state("disabled")
+        self.combo_hour2.state("disabled") #disabled combobox when starting the timer
+        self.combo_hour3.state("disabled")
 
             
     def thread_safe_update(self, remaining_seconds):
@@ -158,7 +168,7 @@ class PomodoroApp:
     def timer_change(self,value):
 
         if value.isdigit():
-            self.initial_timer_user = int(value) * 60
+            self.initial_timer_user = int(value) 
             self.update_ui(self.initial_timer_user)
         else:
             self.initial_timer_user = 0
@@ -173,7 +183,7 @@ class PomodoroApp:
 
     def timer_interval_change(self,value):
 
-        self.time_interval = int(value) * 60
+        self.time_interval = int(value)
 
 
     def changeStatusButton(self, state):
@@ -206,8 +216,6 @@ class PomodoroApp:
         self.start_timer(self.initial_timer_user)
         self.number_of_sessions -= 1
 
-
-    
 
 def main():
 
