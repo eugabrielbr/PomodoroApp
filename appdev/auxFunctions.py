@@ -3,7 +3,6 @@ import threading
 import time
 import os
 
-
 notificacao_ativa = False
 
 def format_time(seconds):
@@ -39,7 +38,7 @@ def notificationSystem(titulo, mensagem, timeout):
         time.sleep(timeout)
         notificacao_ativa = False
 
-    threading.Thread(target=worker, daemon=True).start()
+    thread = threading.Thread(target=worker, daemon=True).start()
 
 def notification_with_click(titulo, mensagem, timeout):
     """
@@ -65,5 +64,8 @@ def notification_with_click(titulo, mensagem, timeout):
     clicou_event.wait(timeout_click)  # bloqueia aqui até clicar ou expirar o timeout
     if not clicou_event.is_set():
         print("Tempo expirou sem clique")
+        return False 
+        
+
       
     return clicou_event.is_set()  # True se clicou, False se expirou
