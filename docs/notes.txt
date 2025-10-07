@@ -12,7 +12,7 @@ IDEIAS
 BUGS 
 
 - ao terminar o timer, e iniciar outro sem apertar reset, ele nao conta os intervalos nem notifica (RESOLVIDO)
-- quando nao tem clique na notificacao, nem todas as vezes a sessao é resetada como esperada
+- quando nao tem clique na notificacao, nem todas as vezes a sessao é resetada como esperada, causando bug na ordem de sessao/intervalo, apesar de funcionarem
 
 
 

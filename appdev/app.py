@@ -208,6 +208,7 @@ class PomodoroApp:
         self.time_interval = 0
 
         self.changeStatusButton("disabled")
+        
             
     def thread_safe_update(self, remaining_seconds):
         if self.actual:
@@ -215,18 +216,18 @@ class PomodoroApp:
 
     def timer_change(self, value):
         if value.isdigit():
-            self.initial_timer_user = int(value) 
+            self.initial_timer_user = int(value) * 60
             self.update_ui(self.initial_timer_user)
         else:
             self.initial_timer_user = 0
 
     def timer_sessions_change(self, value):
-        value = int(value)
+        value = int(value) 
         if value > 0:
             self.number_of_sessions = value - 1 
 
     def timer_interval_change(self, value):
-        self.time_interval = int(value) 
+        self.time_interval = int(value) * 60
 
     def changeStatusButton(self, state):
         self.start_button.configure(state=state)
@@ -243,6 +244,7 @@ class PomodoroApp:
         if retorno:
             self.root.after(0, lambda: self.start_focus())
         else:
+            
             self.root.after(0, lambda: self.end_cycle())
        
     def start_interval(self):

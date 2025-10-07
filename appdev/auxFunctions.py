@@ -15,6 +15,7 @@ def ao_clicar():
 
 
 def notificationSystem(titulo, mensagem, timeout):
+   
     global notificacao_ativa
 
     if notificacao_ativa:
@@ -46,6 +47,7 @@ def notification_with_click(titulo, mensagem, timeout):
     """
     clicou_event = threading.Event()  # cria um evento para sincronização
     timeout_click = 240
+   
     def ao_clicar():
         print("Notificação clicada!")
         clicou_event.set()  # libera a espera
