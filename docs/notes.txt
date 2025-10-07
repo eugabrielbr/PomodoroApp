@@ -1,11 +1,20 @@
-PASSOS 
+REALESE NOTES
+
+- TEMPO DE NOTIFICACAO AUMENTADO (talvez nao de)
 
 
-
-APLICATIVO POMODORO IDEIAS
+IDEIAS
 
 - som ao passar os segundos (tictac, ruido, etc)
 - alerta de responsabilidade para cumprir o pomodoro - OK 
+
+
+BUGS 
+
+- ao terminar o timer, e iniciar outro sem apertar reset, ele nao conta os intervalos nem notifica (RESOLVIDO)
+- quando nao tem clique na notificacao, nem todas as vezes a sessao é resetada como esperada, causando bug na ordem de sessao/intervalo, apesar de funcionarem
+
+
 
 
 organizacao de versoes
