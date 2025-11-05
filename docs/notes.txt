@@ -24,3 +24,7 @@ organizacao de versoes
 1.1.1 -> corrige bug
 
 
+
+COD PYINSTALLER 
+
+pyinstaller --onefile --noconsole --name PomodoroApp --icon="..\resources\icons\logo.ico" "..\appdev\app.py"
